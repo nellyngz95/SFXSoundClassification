@@ -7,6 +7,10 @@ import numpy as np
 import pandas as pd
 import torch.nn as nn
 import torch.nn.functional as F
+from torch import hub
+import sys
+sys.path.append('/Users/nellygarcia/Documents/SFXSoundClassification')
+import vggish_input, vggish_params
 #Building a Classifier
 class Classifier(nn.Module):
     def __init__(self):
@@ -24,3 +28,27 @@ class Classifier(nn.Module):
         x = F.log_softmax(self.fc3(x), dim=1)
         return x
     
+
+class VGG(nn.Module):
+    def __init__(self, features):
+        super(VGG, self).__init__()
+        self.features = features
+        self.embeddings = nn.Sequential(
+            nn.Linear(512 * 4 * 6, 4096),
+            nn.ReLU(True),
+            nn.Linear(4096, 4096),
+            nn.ReLU(True),
+            nn.Linear(4096, 128),
+            nn.ReLU(True))
+
+    def forward(self, x):
+        x = self.features(x)
+
+        # Transpose the output from features to
+        # remain compatible with vggish embeddings
+        x = torch.transpose(x, 1, 3)
+        x = torch.transpose(x, 1, 2)
+        x = x.contiguous()
+        x = x.view(x.size(0), -1)
+
+        return self.embeddings(x)
