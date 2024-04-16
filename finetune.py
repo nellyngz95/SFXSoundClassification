@@ -22,12 +22,12 @@ from models import *
 import config
 
 
-class Transfer_Cnn14(nn.Module):
+class Transfer_ResNet(nn.Module):
     def __init__(self, sample_rate, window_size, hop_size, mel_bins, fmin, 
         fmax, classes_num, freeze_base):
         """Classifier for a new task using pretrained Cnn14 as a sub module.
         """
-        super(Transfer_Cnn14, self).__init__()
+        super(Transfer_ResNet, self).__init__()
         audioset_classes_num = 527
         
         self.base = ResNet22 (sample_rate, window_size, hop_size, mel_bins, fmin, 
